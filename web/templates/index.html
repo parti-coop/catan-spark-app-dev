@@ -1,0 +1,41 @@
+<h1>PartiApp WebDemo</h1>
+<p>(여기가 초기 페이지 입니다.)</p>
+<hr>
+<div class="center">
+{{#loginUser}}
+<span class="green">로그인 상태입니다: <b>{{loginUser}}</b></span>
+{{/loginUser}}
+{{^loginUser}}
+<span class="red">로그인되지 않았습니다.</span>
+{{/loginUser}}
+</div>
+<hr>
+
+<h3>유저 관리</h3>
+<ul>
+    <li><a href="/user/register">사용자 등록</a></li>
+    <li><a href="/user/login">로그인</a></li>
+    <li><a href="/user/logout">로그아웃</a></li>
+    <li><a href="/user/sendpush">푸시 메세지 보내기</a></li>
+</ul>
+
+<h3>기타 기능</h3>
+<ul>
+    <li><a onclick="showWait()">뺑글이 대기화면 표시 (3초후 감춤)</a></li>
+</ul>
+
+
+
+<script src="/js/ufo.js"></script>
+<script>
+function showWait() {
+    if (ufo.isApp()) {
+        ufo.showWait();
+        setTimeout(function() {
+            ufo.hideWait();
+        }, 3000);
+    } else {
+        alert("앱에서만 지원되는 기능입니다.");
+    }
+}
+</script>

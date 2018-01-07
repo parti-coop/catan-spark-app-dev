@@ -1,0 +1,26 @@
+{
+  "name": "partiweb",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "DEBUG=app node ./bin/www",
+    "start": "node ./bin/www",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.15.5",
+    "fcm-node": "^1.2.1",
+    "morgan": "~1.9.0",
+    "mustache-express": "^1.2.5",
+    "mustache-layout": "^1.2.0",
+    "serve-favicon": "~2.4.5",
+    "tingodb": "^0.5.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^4.1.0"
+  }
+}

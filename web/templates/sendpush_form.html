@@ -1,0 +1,39 @@
+<h1>푸시 메세지 전송 테스트</h1>
+
+<h3>보낼 대상을 선택하십시오:</h3>
+<form action="" method="POST">
+<table>
+	<thead>
+		<tr>
+			<th>선택</th>
+			<th>사용자 ID</th>
+			<th>푸시 토큰 (RegId)</th>
+			<th>어플리케이션 ID</th>
+		</tr>
+	</thead>
+	<tbody>
+	{{#tokens}}
+		<tr>
+			<td><input type="radio" name="to" value="{{regId}}"></td>
+			<td>{{loginId}}</td>
+			<td>{{regId}}</td>
+			<td>{{appId}}</td>
+		</tr>
+	{{/tokens}}
+	</tbody>
+</table>
+
+<p>
+	제목: <input type="text" name="title" size="40" value="푸시 타이틀 입니다.">
+</p>
+
+<p>본문:<br>
+	<textarea name="body" cols="43" rows="5">푸시 메세지 본문입니다. 어느정도 길게 쓸 수 있어요!</textarea>
+</p>
+
+<p>
+	(옵션) URL: <input type="text" name="url" size="30">
+</p>
+
+<input type="submit" value="푸시 전송">
+</form>

@@ -1,0 +1,14 @@
+*.iml
+.DS_Store
+.gradle
+.idea
+/android/local.properties
+/android/build
+/android/app/build
+/android/captures
+.externalNativeBuild
+ios/Pods
+ios/Podfile.lock
+web/_*
+web/node_modules
+shkim.*

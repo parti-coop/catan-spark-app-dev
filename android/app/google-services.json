@@ -1,0 +1,67 @@
+﻿{
+  "project_info": {
+    "project_number": "762145604577",
+    "firebase_url": "https://parti-xyz.firebaseio.com",
+    "project_id": "parti-xyz",
+    "storage_bucket": "parti-xyz.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:762145604577:android:d475d9a39a6438f0",
+        "android_client_info": {
+          "package_name": "xyz.parti.catan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "762145604577-u51assvv29g9ska9fvmgt8hqt0j7tlg2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "xyz.parti.catan",
+            "certificate_hash": "a51d4214a1d90306a0677840d454f48d88ab854d"
+          }
+        },
+        {
+          "client_id": "762145604577-dphnbaqisl0nh4vkueetc53esvug2g1s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "xyz.parti.catan",
+            "certificate_hash": "112bb51810884c168ec6b886c90743cbea53756e"
+          }
+        },
+        {
+          "client_id": "762145604577-2n8635tviagojrdp5f61hovk0tcu5lc6.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "762145604577-vcp1j2aicbg2ava6tbkk9ofke5jugrt3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMgFyHDqp1QBSZiCPz6hX6BBb8z_JNBBI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "762145604577-2n8635tviagojrdp5f61hovk0tcu5lc6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
