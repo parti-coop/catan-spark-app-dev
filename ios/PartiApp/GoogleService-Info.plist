@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3930256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3930256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>763696052795-mtf5qtqn8f9nt2uhjuh57d3dh8mgraq4.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.763696052795-mtf5qtqn8f9nt2uhjuh57d3dh8mgraq4</string>
+	<key>API_KEY</key>
+	<string>AIzaXyAA-5rWb6YZeC8zSc28Zn8nq_rFs7B7Muk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>763636052795</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>slowalk.partiApp</string>
+	<key>PROJECT_ID</key>
+	<string>parti</string>
+	<key>STORAGE_BUCKET</key>
+	<string>parti.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true></true>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<false></false>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:763996052795:ios:6d0e3081b578a3ae</string>
+	<key>DATABASE_URL</key>
+	<string>https://parti.firebaseio.com</string>
+</dict>
+</plist>
