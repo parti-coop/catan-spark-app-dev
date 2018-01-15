@@ -43,7 +43,7 @@ class UfoWebView : WKWebView, WKScriptMessageHandler, WKNavigationDelegate, WKUI
 	
 	func showOfflinePage() {
 		loadLocalHtml("offline")
-		m_wasOffline = true;
+		m_wasOffline = true
 	}
 	
 	func onNetworkReady() {
@@ -137,14 +137,14 @@ class UfoWebView : WKWebView, WKScriptMessageHandler, WKNavigationDelegate, WKUI
 
 		switch (nserr.code)
 		{
-		case 102:// frame load interrupted
+		case 102,// frame load interrupted
+			NSURLErrorCancelled:
 			break
 			
 		case NSURLErrorUnsupportedURL:
 			return
 		
 		case NSURLErrorTimedOut,
-			NSURLErrorCancelled,
 			NSURLErrorCannotFindHost,
 			NSURLErrorCannotConnectToHost,
 			NSURLErrorNetworkConnectionLost,
@@ -225,8 +225,8 @@ class UfoWebView : WKWebView, WKScriptMessageHandler, WKNavigationDelegate, WKUI
 			return
 		}
 		
-		print("willNavigate: \(url)")
-
+		print("willNavigate \(request.httpMethod ?? "?"): \(url)")
+		
 		if url.hasPrefix("ufo:") {
 			decisionHandler(.cancel)
 			let index = url.index(url.startIndex, offsetBy: 4)
@@ -235,7 +235,14 @@ class UfoWebView : WKWebView, WKScriptMessageHandler, WKNavigationDelegate, WKUI
 		}
 		
 		if url.hasPrefix("http") {
-		
+			if let targetFrm = navigationAction.targetFrame {
+				if targetFrm.isMainFrame == false {
+					// maybe ajax call
+					decisionHandler(.allow)
+					return
+				}
+			}
+			
 			if request.httpMethod != "GET" {
 				if m_isAutomaticShowHideWait {
 					showWait()
@@ -250,7 +257,7 @@ class UfoWebView : WKWebView, WKScriptMessageHandler, WKNavigationDelegate, WKUI
 				return
 			}
 			
-			m_lastOnlineUrl = url;
+			m_lastOnlineUrl = url
 	
 			if m_isAutomaticShowHideWait {
 				showWait()
@@ -259,19 +266,19 @@ class UfoWebView : WKWebView, WKScriptMessageHandler, WKNavigationDelegate, WKUI
 			guard let mutableRequest = (request as NSURLRequest).mutableCopy() as? NSMutableURLRequest else {
 				// failed to get mutable request copy
 				decisionHandler(.allow)
-				return;
+				return
 			}
 
 			decisionHandler(.cancel)
 			
-			mutableRequest.setValue("catan-spark-ios", forHTTPHeaderField: UfoWebView.HEADERKEY_CATAN_AGENT)
+			mutableRequest.setValue("catan-spark-android", forHTTPHeaderField: UfoWebView.HEADERKEY_CATAN_AGENT)
 			mutableRequest.setValue("1.0.0", forHTTPHeaderField: UfoWebView.HEADERKEY_CATAN_VERSION)
-			super.load(mutableRequest as URLRequest)
+			webView.load(mutableRequest as URLRequest)
 			return
 		}
 		
 		// unknown scheme
-		decisionHandler(.allow);	// or .cancel?
+		decisionHandler(.allow)	// or .cancel?
 	}
 
 /*
@@ -300,8 +307,8 @@ class UfoWebView : WKWebView, WKScriptMessageHandler, WKNavigationDelegate, WKUI
 			action = String(ufoCommand[...slashLeft])
 			param = String(ufoCommand[rngSlash.lowerBound...])
 		} else {
-			action = ufoCommand;
-			param = nil;
+			action = ufoCommand
+			param = nil
 		}
 	
 		if action == "post" {

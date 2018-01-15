@@ -24,7 +24,8 @@ class ApiMan : NSObject, HttpQueryDelegate
 	static let JOBID_DOWNLOAD_FILE = 3
 
 	static func setDevMode() {
-		ApiMan.API_BASEURL = "http://192.168.0.100:8500/"
+		//ApiMan.API_BASEURL = "http://192.168.0.100:8500/"
+		ApiMan.API_BASEURL = "https://dev.parti.xyz/"
 	}
 	
 	static func getBaseUrl() -> String {
