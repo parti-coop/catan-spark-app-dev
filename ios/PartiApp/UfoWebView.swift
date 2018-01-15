@@ -41,10 +41,29 @@ class UfoWebView : WKWebView, WKScriptMessageHandler, WKNavigationDelegate, WKUI
 		fatalError("init(coder:) has not been implemented")
 	}
 	
+	func showOfflinePage() {
+		loadLocalHtml("offline")
+		m_wasOffline = true;
+	}
+	
+	func onNetworkReady() {
+		if m_wasOffline, let lastOnlineUrl = m_lastOnlineUrl {
+			m_wasOffline = false
+			print("Recover online: \(lastOnlineUrl)")
+			loadRemoteUrl(lastOnlineUrl)
+		}
+	}
+	
+	func loadLocalHtml(_ filename: String) {
+		let path = Bundle.main.path(forResource: filename, ofType: "html")
+		let fileUrl = URL.init(fileURLWithPath: path!)
+		super.loadFileURL(fileUrl, allowingReadAccessTo: Bundle.main.bundleURL)
+	}
+
 	func loadRemoteUrl(_ url: String) {
 		print("loadRemoteUrl: \(url)")
 		let req = URLRequest(url: URL(string: url)!)
-		self.load(req)
+		super.load(req)
 	}
 	
 	private func _post(_ action: String, json jsonString: String?) {
@@ -111,11 +130,12 @@ class UfoWebView : WKWebView, WKScriptMessageHandler, WKNavigationDelegate, WKUI
 	}
 
 	func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+		let nserr = error as NSError
+		
 		let url = webView.url?.absoluteString ?? "nil"
-		let code = (error as NSError).code
-		print("didFailProvisionalNavigation: \(url) \(code)")
+		print("didFailProvisionalNavigation: \(url) \(nserr.code)")
 
-		switch (code)
+		switch (nserr.code)
 		{
 		case 102:// frame load interrupted
 			break
@@ -132,7 +152,7 @@ class UfoWebView : WKWebView, WKScriptMessageHandler, WKNavigationDelegate, WKUI
 			NSURLErrorResourceUnavailable,
 			NSURLErrorNotConnectedToInternet,
 			NSURLErrorRedirectToNonExistentLocation:
-			//[self showOfflinePage];
+			showOfflinePage()
 			break
 			
 		default:

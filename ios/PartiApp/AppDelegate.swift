@@ -7,15 +7,18 @@
 //
 
 import UIKit
-import FirebaseCore
-import FirebaseMessaging
 import UserNotifications
+import AVFoundation
+
+import Firebase
+import FirebaseMessaging
+
 import Fabric
 import Crashlytics
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
+class AppDelegate: UIResponder, UIApplicationDelegate
+{
 	var window: UIWindow?
 	
 	private var httpMan: HttpMan = HttpMan()
@@ -29,80 +32,72 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		return (UIApplication.shared.delegate as! AppDelegate).apiMan
 	}
 
-	static let isWithinUnitTest: Bool = {
-		if let testClass = NSClassFromString("XCTestCase") {
-			return true
-		} else {
-			return false
-		}
-	}()
-	
-	static var hasPresentedInvalidServiceInfoPlistAlert = false
-
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 		Fabric.with([Crashlytics.self])
-		
-		guard !AppDelegate.isWithinUnitTest else {
-			// During unit tests, we don't want to initialize Firebase, since by default we want to able
-			// to run unit tests without requiring a non-dummy GoogleService-Info.plist file
-			return true
-		}
-
-		guard Util.appContainsRealServiceInfoPlist() else {
-			// We can't run because the GoogleService-Info.plist file is likely the dummy file which needs
-			// to be replaced with a real one, or somehow the file has been removed from the app bundle.
-			// See: https://github.com/firebase/firebase-ios-sdk/
-			// We'll present a friendly alert when the app becomes active.
-			return true
-		}
-
 		FirebaseApp.configure()
-
+		
 		Messaging.messaging().delegate = self
-		Messaging.messaging().shouldEstablishDirectChannel = true
-		// Just for logging to the console when we establish/tear down our socket connection.
-		listenForDirectChannelStateChanges();
-
-		NotificationsController.configure()
-
-		if #available(iOS 8.0, *) {
-			// Always register for remote notifications. This will not show a prompt to the user, as by
-			// default it will provision silent notifications. We can use UNUserNotificationCenter to
-			// request authorization for user-facing notifications.
-			application.registerForRemoteNotifications()
+		
+		// Register for remote notifications. This shows a permission dialog on first run, to
+		// show the dialog at a more appropriate time move this registration accordingly.
+		if #available(iOS 10.0, *) {
+			// For iOS 10 display notification (sent via APNS)
+			UNUserNotificationCenter.current().delegate = self
+			let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+			UNUserNotificationCenter.current().requestAuthorization(options: authOptions,
+				completionHandler: {_, _ in })
 		} else {
-			// iOS 7 didn't differentiate between user-facing and other notifications, so we should just
-			// register for remote notifications
-			NotificationsController.shared.registerForUserFacingNotificationsFor(application)
+			let settings = UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+			application.registerUserNotificationSettings(settings)
 		}
+
+		application.registerForRemoteNotifications()
 		
 		// Override point for customization after application launch.
 		return true
 	}
+
+  	//let gcmMessageIDKey = "gcm.message_id"
 	
-	func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-		print("APNS Token: \(deviceToken.hexByteString)")
-		NotificationCenter.default.post(name: APNSTokenReceivedNotification, object: nil)
-		if #available(iOS 8.0, *) {
-		} else {
-			// On iOS 7, receiving a device token also means our user notifications were granted, so fire
-			// the notification to update our user notifications UI
-			NotificationCenter.default.post(name: UserNotificationsChangedNotification, object: nil)
+	func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
+		// If you are receiving a notification message while your app is in the background,
+		// this callback will not be fired till the user taps on the notification launching the application.
+		handlePushData(userInfo)
+	}
+	
+/*	func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+		fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+		// If you are receiving a notification message while your app is in the background,
+		// this callback will not be fired till the user taps on the notification launching the application.
+		// TODO: Handle data of notification
+		// With swizzling disabled you must let Messaging know about the message, for Analytics
+		// Messaging.messaging().appDidReceiveMessage(userInfo)
+		// Print message ID.
+		if let messageID = userInfo[gcmMessageIDKey] {
+			print("Message ID: \(messageID)")
 		}
+
+		// Print full message.
+		handlePushData(userInfo)
+
+		completionHandler(UIBackgroundFetchResult.newData)
+	}*/
+
+	func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+		print("Unable to register for remote notifications: \(error.localizedDescription)")
 	}
 
-	func application(_ application: UIApplication,
-		didRegister notificationSettings: UIUserNotificationSettings) {
-		NotificationCenter.default.post(name: UserNotificationsChangedNotification, object: nil)
+	// This function is added here only for debugging purposes, and can be removed if swizzling is enabled.
+	// If swizzling is disabled then this function must be implemented so that the APNs token can be paired to
+	// the FCM registration token.
+	func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+		print("APNs token retrieved: \(deviceToken)")
+
+		// With swizzling disabled you must set the APNs token here.
+		// Messaging.messaging().apnsToken = deviceToken
 	}
 
-	func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-		print("application:didReceiveRemoteNotification:fetchCompletionHandler: called, with notification:")
-		print("\(userInfo.jsonString ?? "{}")")
-		completionHandler(.newData)
-	}
-
-
+/*
 	func applicationWillResignActive(_ application: UIApplication) {
 		// Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
 		// Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
@@ -119,19 +114,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func applicationDidBecomeActive(_ application: UIApplication) {
 		// Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-		
-		// If the app didn't start property due to an invalid GoogleService-Info.plist file, show an alert to the developer.
-		if !Util.appContainsRealServiceInfoPlist() && !AppDelegate.hasPresentedInvalidServiceInfoPlistAlert {
-			if let vc = window?.rootViewController {
-				Util.presentAlertForInvalidServiceInfoPlistFrom(vc)
-				AppDelegate.hasPresentedInvalidServiceInfoPlistAlert = true
-			}
-		}
 	}
 
 	func applicationWillTerminate(_ application: UIApplication) {
 		// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 	}
+*/
 
 	func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
 		debugPrint("handleEventsForBackgroundURLSession: \(identifier)")
@@ -139,59 +127,80 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 
-
+	func handlePushData(_ pushInfo: [AnyHashable : Any]) {
+		//print("handlePushData: ", Util.getPrettyJsonString(pushInfo) ?? "nil")
+		
+		let url = pushInfo["url"]
+		
+		if let aps = pushInfo["aps"] as? NSDictionary {
+			var title: String?
+			var body: String?
+			
+			let alert = aps["alert"]
+			if let alertStr = alert as? String {
+				body = alertStr
+			} else if let alertDic = alert as? NSDictionary {
+				body = alertDic["body"] as? String
+				title = alertDic["title"] as? String
+			} else {
+				print("Unknown alert type: \(String(describing: alert))")
+				return
+			}
+		
+			if aps["sound"] != nil {
+				AudioServicesPlaySystemSound(1315)
+			}
+			
+			let alertController = UIAlertController(title: title, message:body, preferredStyle:.alert)
+			alertController.addAction(UIAlertAction(title: Util.getLocalizedString("ok"), style:.`default`, handler: { _ in
+				if let urlStr = url as? String {
+					ViewController.instance.gotoUrl(urlStr)
+				}
+			}))
+			ViewController.instance.present(alertController, animated:true, completion:nil)
+		}
+	}
 }
 
-extension AppDelegate: MessagingDelegate {
-	// FCM tokens are always provided here. It is called generally during app start, but may be called
-	// more than once, if the token is invalidated or updated. This is the right spot to upload this
-	// token to your application server, or to subscribe to any topics.
+@available(iOS 10, *)
+extension AppDelegate : UNUserNotificationCenterDelegate
+{
+	// Receive displayed notifications for iOS 10 devices.
+	func userNotificationCenter(_ center: UNUserNotificationCenter,
+		willPresent notification: UNNotification,
+		withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+		
+		handlePushData(notification.request.content.userInfo)
+
+		// Change this to your preferred presentation option
+		completionHandler([])
+	}
+
+	func userNotificationCenter(_ center: UNUserNotificationCenter,
+		didReceive response: UNNotificationResponse,
+		withCompletionHandler completionHandler: @escaping () -> Void) {
+		
+		handlePushData(response.notification.request.content.userInfo)
+
+		completionHandler()
+	}
+}
+
+extension AppDelegate : MessagingDelegate
+{
 	func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-		if let token = Messaging.messaging().fcmToken {
-			print("FCM Token: \(token)")
-		} else {
-			print("FCM Token: nil")
-		}
+		print("Firebase registration token: \(fcmToken)")
+
+		// TODO: If necessary send token to application server.
+		// Note: This callback is fired at each app startup and whenever a new token is generated.
 	}
 
-	// Direct channel data messages are delivered here, on iOS 10.0+.
-	// The `shouldEstablishDirectChannel` property should be be set to |true| before data messages can
-	// arrive.
+	// [END refresh_token]
+	// [START ios_10_data_message]
+	// Receive data messages on iOS 10+ directly from FCM (bypassing APNs) when the app is in the foreground.
+	// To enable direct data messages, you can set Messaging.messaging().shouldEstablishDirectChannel to true.
 	func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
-		// Convert to pretty-print JSON
-		guard let prettyPrinted = remoteMessage.appData.jsonString else {
-			print("Received direct channel message, but could not parse as JSON: \(remoteMessage.appData)")
-			return
-		}
-		print("Received direct channel message:\n\(prettyPrinted)")
-	}
-}
-
-extension AppDelegate {
-	func listenForDirectChannelStateChanges() {
-		NotificationCenter.default.addObserver(self, selector: #selector(onMessagingDirectChannelStateChanged(_:)), name: .MessagingConnectionStateChanged, object: nil)
-	}
-
-	@objc func onMessagingDirectChannelStateChanged(_ notification: Notification) {
-		print("FCM Direct Channel Established: \(Messaging.messaging().isDirectChannelEstablished)")
-	}
-}
-
-extension Dictionary {
-	/// Utility method for printing Dictionaries as pretty-printed JSON.
-	var jsonString: String? {
-		if let jsonData = try? JSONSerialization.data(withJSONObject: self, options: [.prettyPrinted]),
-			let jsonString = String(data: jsonData, encoding: .utf8) {
-			return jsonString
-		}
-		return nil
-	}
-}
-
-extension Data {
-	// Print Data as a string of bytes in hex, such as the common representation of APNs device tokens
-	// See: http://stackoverflow.com/a/40031342/9849
-	var hexByteString: String {
-		return self.map { String(format: "%02.2hhx", $0) }.joined()
+		//print("Received data message: \(remoteMessage.appData)")
+		handlePushData(remoteMessage.appData)
 	}
 }

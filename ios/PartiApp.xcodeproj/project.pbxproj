@@ -10,7 +10,6 @@
 		1EB65DA91FED29E700E1B5A9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB65DA81FED29E700E1B5A9 /* AppDelegate.swift */; };
 		1EB65DAB1FED29E700E1B5A9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB65DAA1FED29E700E1B5A9 /* ViewController.swift */; };
 		1EB65DB01FED29E700E1B5A9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1EB65DAF1FED29E700E1B5A9 /* Assets.xcassets */; };
-		1EB65DBB1FED2FDF00E1B5A9 /* NotificationsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB65DBA1FED2FDF00E1B5A9 /* NotificationsController.swift */; };
 		1EB65DBD1FEF97B600E1B5A9 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB65DBC1FEF97B600E1B5A9 /* Util.swift */; };
 		1EB65DC21FEFB63400E1B5A9 /* logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1EB65DBF1FEFB63400E1B5A9 /* logo@2x.png */; };
 		1EB65DC31FEFB63400E1B5A9 /* offline.html in Resources */ = {isa = PBXBuildFile; fileRef = 1EB65DC01FEFB63400E1B5A9 /* offline.html */; };
@@ -30,12 +29,12 @@
 /* Begin PBXFileReference section */
 		1BE6E7AB59971B806E569940 /* Pods-PartiApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PartiApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PartiApp/Pods-PartiApp.debug.xcconfig"; sourceTree = "<group>"; };
 		1E13EAD8200B88B90063BF38 /* Bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Bridge.h; sourceTree = "<group>"; };
+		1E24C48F200CCBE9004D0B4A /* PartiApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PartiApp.entitlements; sourceTree = "<group>"; };
 		1EB65DA51FED29E700E1B5A9 /* PartiApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PartiApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1EB65DA81FED29E700E1B5A9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1EB65DAA1FED29E700E1B5A9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		1EB65DAF1FED29E700E1B5A9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1EB65DB41FED29E700E1B5A9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1EB65DBA1FED2FDF00E1B5A9 /* NotificationsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsController.swift; sourceTree = "<group>"; };
 		1EB65DBC1FEF97B600E1B5A9 /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		1EB65DBF1FEFB63400E1B5A9 /* logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "logo@2x.png"; sourceTree = "<group>"; };
 		1EB65DC01FEFB63400E1B5A9 /* offline.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = offline.html; sourceTree = "<group>"; };
@@ -95,6 +94,7 @@
 		1EB65DA71FED29E700E1B5A9 /* PartiApp */ = {
 			isa = PBXGroup;
 			children = (
+				1E24C48F200CCBE9004D0B4A /* PartiApp.entitlements */,
 				1EB65DD31FF0075200E1B5A9 /* en.lproj */,
 				1EB65DD81FF0075200E1B5A9 /* ko.lproj */,
 				1EB65DC71FF0056000E1B5A9 /* LaunchScreen.storyboard */,
@@ -109,7 +109,6 @@
 				1EB65DE31FF0095500E1B5A9 /* ApiMan.swift */,
 				1EB65DC51FEFB6BF00E1B5A9 /* UfoWebView.swift */,
 				1EB65DAA1FED29E700E1B5A9 /* ViewController.swift */,
-				1EB65DBA1FED2FDF00E1B5A9 /* NotificationsController.swift */,
 				1EB65DA81FED29E700E1B5A9 /* AppDelegate.swift */,
 			);
 			path = PartiApp;
@@ -187,6 +186,14 @@
 					1EB65DA41FED29E600E1B5A9 = {
 						CreatedOnToolsVersion = 9.1;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 0;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -311,7 +318,6 @@
 			files = (
 				1EB65DE21FF0093D00E1B5A9 /* HttpMan.swift in Sources */,
 				1EB65DC61FEFB6BF00E1B5A9 /* UfoWebView.swift in Sources */,
-				1EB65DBB1FED2FDF00E1B5A9 /* NotificationsController.swift in Sources */,
 				1EB65DE41FF0095500E1B5A9 /* ApiMan.swift in Sources */,
 				1EB65DAB1FED29E700E1B5A9 /* ViewController.swift in Sources */,
 				1EB65DA91FED29E700E1B5A9 /* AppDelegate.swift in Sources */,
@@ -487,12 +493,13 @@
 			baseConfigurationReference = 1BE6E7AB59971B806E569940 /* Pods-PartiApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PartiApp/PartiApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = CA5Q42V582;
+				DEVELOPMENT_TEAM = JXQFYHHM4W;
 				INFOPLIST_FILE = PartiApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = slowalk.PartiApp;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.parti.catanapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = PartiApp/Bridge.h;
 				SWIFT_VERSION = 4.0;
@@ -505,12 +512,13 @@
 			baseConfigurationReference = 4A4503D2E34DE811EA771C49 /* Pods-PartiApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PartiApp/PartiApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = CA5Q42V582;
+				DEVELOPMENT_TEAM = JXQFYHHM4W;
 				INFOPLIST_FILE = PartiApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = slowalk.PartiApp;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.parti.catanapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = PartiApp/Bridge.h;
 				SWIFT_VERSION = 4.0;

@@ -7,7 +7,10 @@
 //
 
 import UIKit
+
 import MBProgressHUD
+import TMReachability
+import FirebaseMessaging
 import Crashlytics
 
 class ViewController: UIViewController, UIDocumentInteractionControllerDelegate
@@ -40,8 +43,16 @@ class ViewController: UIViewController, UIDocumentInteractionControllerDelegate
 		
 #if DEBUG
 		ApiMan.setDevMode()
+	
+		let toast = MBProgressHUD.showAdded(to: view, animated: true)
+		toast.mode = MBProgressHUDMode.text
+		toast.label.text = "개발자모드"
+		toast.offset = CGPoint(x: 0, y: MBProgressMaxOffset)
+		toast.hide(animated: true, afterDelay: 3)
 #endif
 
+		setupReachability()
+		
 		m_webView = UfoWebView()
 		m_webView.ufoDelegate = self
 		m_webView.translatesAutoresizingMaskIntoConstraints = false
@@ -81,7 +92,39 @@ class ViewController: UIViewController, UIDocumentInteractionControllerDelegate
 	
 		m_webView.loadRemoteUrl(ApiMan.getBaseUrl() + "mobile_app/start")
 	}
+	
+	private func setupReachability() {
+		NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged(noti:)),
+			name: NSNotification.Name.reachabilityChanged, object: nil)
 
+		let remoteHostReach = TMReachability(hostname: "google.com")
+		remoteHostReach?.startNotifier()
+	}
+	
+	@objc func reachabilityChanged(noti: Notification?) {
+		guard let reach = noti?.object as? TMReachability else {
+			return
+		}
+
+		if reach.isReachable() {
+			//print("RemoteHostReachable", reach.currentReachabilityString())
+			m_webView.onNetworkReady()
+		} else {
+			//print("RemoteHostNotReachable", reach.currentReachabilityString())
+		}
+	}
+
+	func gotoUrl(_ url: String) {
+		let urlToGo: String
+		if url.hasPrefix("/") {
+			urlToGo = ApiMan.getBaseUrl() + String(url.dropFirst())
+		} else {
+			urlToGo = url
+		}
+		
+		m_webView.loadRemoteUrl(urlToGo)
+	}
+	
 	private func isShowWait() -> Bool {
 		return !vwWaitScreen.isHidden
 	}
@@ -138,9 +181,7 @@ class ViewController: UIViewController, UIDocumentInteractionControllerDelegate
 				ud.set(authkey, forKey:ViewController.KEY_AUTHKEY)
 				ud.synchronize()
 				
-				// TODO: use [FIRMessaging messaging].FCMToken]
-				let pushToken = "iOS_TEST_ThisIsInvalidPushToken"
-				
+				let pushToken = Messaging.messaging().fcmToken
 				let appId = Bundle.main.bundleIdentifier!
 				AppDelegate.getApiManager().requestRegisterToken(self as ApiResultDelegate, authkey: authkey, pushToken: pushToken, appId: appId)
 		
@@ -160,7 +201,7 @@ class ViewController: UIViewController, UIDocumentInteractionControllerDelegate
 				ud.removeObject(forKey: ViewController.KEY_AUTHKEY)
 				ud.synchronize()
 				
-				let pushToken = "iOS_TEST_ThisIsInvalidPushToken"
+				let pushToken = Messaging.messaging().fcmToken
 				if !Util.isNilOrEmpty(pushToken) {
 					AppDelegate.getApiManager().requestDeleteToken(self as ApiResultDelegate, authkey: lastAuthKey!, pushToken: pushToken)
 				}
@@ -173,11 +214,6 @@ class ViewController: UIViewController, UIDocumentInteractionControllerDelegate
 	}
 	
 	private func handleDownload(_ json: [String : Any]?) {
-		guard let authkey = getAuthKey() else {
-			Util.showSimpleAlert("로그인 정보가 올바르지 않습니다.")
-			return
-		}
-		
 		let _postId = json?["post"] as? Int
 		let _fileId = json?["file"] as? Int
 		let _fileName = json?["name"] as? String
@@ -197,7 +233,7 @@ class ViewController: UIViewController, UIDocumentInteractionControllerDelegate
 		let destPathUrl = URL.init(fileURLWithPath: destPath)
 		try? FileManager.default.removeItem(at: destPathUrl)
 		
-		AppDelegate.getApiManager().requestFileDownload(self, authkey: authkey, postId: postId, fileId: fileId, atLocalPath: destPath)
+		AppDelegate.getApiManager().requestFileDownload(self, authkey: getAuthKey(), postId: postId, fileId: fileId, atLocalPath: destPath)
 		
 		m_curDownloadFilename = fileName
 		m_downloadingHud = MBProgressHUD.showAdded(to: view, animated: true)
@@ -218,7 +254,8 @@ class ViewController: UIViewController, UIDocumentInteractionControllerDelegate
 		{
 		case ApiMan.JOBID_DOWNLOAD_FILE:
 			hideDownloadingHud()
-			break
+			Util.showSimpleAlert("다운로드에 실패하였습니다.")
+			return true
 			
 		default:
 			break

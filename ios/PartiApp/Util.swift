@@ -39,86 +39,16 @@ class Util
 		CC_MD5_Final(&digest, context)
 		context.deallocate(capacity: 1)
 
-		var hexString = ""
-		for byte in digest {
-			hexString += String(format:"%02x", byte)
-		}
-		return hexString
+		// make hex string
+		return digest.map { String(format: "%02.2hhx", $0) }.joined()
 	}
 	
-	
-	
-	// From https://github.com/firebase/firebase-ios-sdk/blob/master/Example/Shared/FIRSampleAppUtilities.m
-	
-	static func appContainsRealServiceInfoPlist() -> Bool {
-		return containsRealServiceInfoPlistInBundle(Bundle.main)
-	}
-
-	static let kServiceInfoFileName = "GoogleService-Info"
-	static let kServiceInfoFileType = "plist"
-	static let kGoogleAppIDPlistKey = "GOOGLE_APP_ID"
-	static let kDummyGoogleAppID = "1:123:ios:123abc"
-	
-	static func containsRealServiceInfoPlistInBundle(_ bundle: Bundle) -> Bool {
-		let bundlePath = bundle.bundlePath
-		if bundlePath.isEmpty {
-			return false;
+	static func getPrettyJsonString(_ src: Dictionary<AnyHashable, Any>) -> String? {
+		if let jsonData = try? JSONSerialization.data(withJSONObject: src, options: [.prettyPrinted]),
+			let jsonString = String(data: jsonData, encoding: .utf8) {
+			return jsonString
 		}
-
-  		let plistFilePath = bundle.path(forResource: kServiceInfoFileName, ofType: kServiceInfoFileType)
-		if Util.isNilOrEmpty(plistFilePath) {
-			return false;
-		}
-		
-		let plist_ = NSDictionary(contentsOfFile: plistFilePath!)
-		guard let plist = plist_ else {
-			return false
-		}
-
-		// Perform a very naive validation by checking to see if the plist has the dummy google app id
-		let googleAppID = plist[kGoogleAppIDPlistKey] as! String?;
-		if Util.isNilOrEmpty(googleAppID) {
-			return false
-		}
-
-		if googleAppID == kDummyGoogleAppID {
-			return false
-		}
-
-		return true
-	}
-	
-	static let kGithubRepoURLString = "https://github.com/firebase/firebase-ios-sdk/"
-	static let kInvalidPlistAlertTitle = "GoogleService-Info.plist"
-	
-	static func presentAlertForInvalidServiceInfoPlistFrom(_ viewController: UIViewController) {
-		let message = """
-This sample app needs to be updated with a valid GoogleService-Info.plist file in order to configure Firebase.
-
-Please update the app with a valid plist file, following the instructions in the Firebase Github repository at: \(kGithubRepoURLString)
-"""
-		
-		let alertController = UIAlertController(title: kInvalidPlistAlertTitle, message:message, preferredStyle:.alert)
-		
-		let viewReadmeAction = UIAlertAction(title: "View Github", style:.`default`, handler: { _ in
-			let githubURL = URL(string: kGithubRepoURLString)!;
-			Util.navigate(toURL:githubURL, fromViewController:viewController);
-		})
-		alertController.addAction(viewReadmeAction)
-
-		let cancelAction = UIAlertAction(title:"Close", style:.cancel)//, handler:nil);
-		alertController.addAction(cancelAction)
-		
-		viewController.present(alertController, animated:true, completion:nil)
-	}
-
-	static func navigate(toURL url: URL, fromViewController viewController: UIViewController) {
-		if #available(iOS 9.0, *) {
-			let svc = SFSafariViewController(url: url)
-			//viewController.presentViewController(svc, animated: true, completion: nil)
-			viewController.showDetailViewController(svc, sender: nil)
-		} else {
-			UIApplication.shared.openURL(url)
-		}
+		return nil
 	}
 }
+
